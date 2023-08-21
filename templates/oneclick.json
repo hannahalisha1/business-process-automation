@@ -530,7 +530,8 @@
       "properties": {
         "replicaCount": 1,
         "partitionCount": 1,
-        "hostingMode": "Default"
+        "hostingMode": "Default",
+        "semanticSearch": "free"
       },
       "tags": {},
       "dependsOn": []
@@ -551,7 +552,7 @@
           "appSettings": [
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
-              "value": "https://bpasource.blob.core.windows.net/source/huggingface/hf_backend_v006.zip?sv=2020-04-08&st=2023-04-17T13%3A10%3A13Z&se=2024-01-24T14%3A10%3A00Z&sr=b&sp=r&sig=Ih%2BTWPUqDBffD9AdrnAOtrMIlzP2OAKZhmB5FXgYWEM%3D"
+              "value": "https://bpasource.blob.core.windows.net/source/huggingface/hf_backend_v012.zip?sv=2021-10-04&st=2023-05-31T17%3A28%3A30Z&se=2024-04-18T17%3A28%3A00Z&sr=b&sp=r&sig=RC7DsOnq6zgmLHy36Ym6UfimmmE9pPMVsxyI04GIGOQ%3D"
             },  
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
@@ -579,11 +580,11 @@
             },
             {
               "name": "AZURE_OPENAI_CHATGPT_DEPLOYMENT",
-              "value": "text-davinci-002"
+              "value": "text-davinci-003"
             },
             {
               "name": "AZURE_OPENAI_GPT_DEPLOYMENT",
-              "value": "text-davinci-002"
+              "value": "text-davinci-003"
             },
             {
               "name": "AZURE_OPENAI_SERVICE",
@@ -642,7 +643,7 @@
           "appSettings": [
             {
               "name": "WEBSITE_RUN_FROM_PACKAGE",
-              "value": "https://bpasource.blob.core.windows.net/source/backendv023.zip?sv=2020-04-08&st=2023-04-17T13%3A08%3A56Z&se=2024-01-24T14%3A08%3A00Z&sr=b&sp=r&sig=RXoIqQTi1ak48eJLU3iBSxa7FKSHwJpOoI2Pr3Bold0%3D"
+              "value": "https://bpasource.blob.core.windows.net/source/backendv041.zip?sv=2020-10-02&st=2023-07-17T13%3A13%3A04Z&se=2024-02-15T14%3A13%3A00Z&sr=b&sp=r&sig=gOsaR8HdSQS8phEB%2FCM2wT%2BqaL5Gyf1DBt5%2BfsIrujs%3D"
             },
             {
               "name": "APPINSIGHTS_INSTRUMENTATIONKEY",

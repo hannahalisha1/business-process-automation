@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { Checkbox, Panel, DefaultButton, TextField, SpinButton } from "@fluentui/react";
+import { Panel, DefaultButton, SpinButton } from "@fluentui/react";
 //import { SparkleFilled } from "@fluentui/react-icons";
 import { Dropdown } from '@fluentui/react-northstar';
 import styles from "./Chat.module.css";
@@ -23,14 +23,17 @@ import axios from 'axios'
 //     ReadDecomposeAsk = "rda"
 // }
 
-const Chat = () => {
+const EnterpriseSearch = () => {
     const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
-    const [promptTemplate, setPromptTemplate] = useState("");
+    // const [promptTemplate, setPromptTemplate] = useState("");
+    // const [facetTemplate, setFacetTemplate] = useState("If the question is asking about 'sentiment' regarding the sources and other documents in the database, use the 'Facets' field to answer the question.");
+    // const [facetQueryTermsTemplate, setFacetQueryTermsTemplate] = useState("When generating the Search Query do not use terms related to sentiment.  Example ['sentiment', 'positive', 'negative',etc]");
     const [retrieveCount, setRetrieveCount] = useState(3);
-    const [useSemanticRanker, setUseSemanticRanker] = useState(true);
-    const [useSemanticCaptions, setUseSemanticCaptions] = useState(false);
-    const [excludeCategory, setExcludeCategory] = useState("");
-    const [useSuggestFollowupQuestions, setUseSuggestFollowupQuestions] = useState(false);
+    //const [useSemanticRanker, setUseSemanticRanker] = useState(true);
+    // const [vectorSearchPipeline, setVectorSearchPipeline] = useState("");
+    //const [useSemanticCaptions, setUseSemanticCaptions] = useState(false);
+    //const [excludeCategory, setExcludeCategory] = useState("");
+    //const [useSuggestFollowupQuestions, setUseSuggestFollowupQuestions] = useState(false);
 
     const lastQuestionRef = useRef("");
     const chatMessageStreamEnd = useRef(null);
@@ -47,27 +50,40 @@ const Chat = () => {
     const [indexes, setIndexes] = useState([])
     const [selectedIndex, setSelectedIndex] = useState(null)
     //const [indexSearchDone, setIndexSearchDone] = useState(false)
+    // const [pipelines, setPipelines] = useState([])
 
-    useEffect(()=>{
+    useEffect(() => {
         axios.get('/api/indexes').then(_indexes => {
-            if(_indexes?.data?.indexes){
+            if (_indexes?.data?.indexes) {
                 //setIndexSearchDone(true)
                 setIndexes(_indexes.data.indexes)
-                setSelectedIndex(_indexes.data.indexes[0]) 
+                setSelectedIndex(_indexes.data.indexes[0])
             }
         }).catch(err => {
             //setIndexSearchDone(true)
             console.log(err)
         })
-    },[])
+        // axios.get('/api/config?id=pipelines').then(value => {
+        //     setPipelines(value.data.pipelines.filter(value => {
+        //         for (const stage of value.stages) {
+        //             if (stage.name === 'openaiEmbeddings') {
+        //                 return true
+        //             }
+        //         }
+        //         return false
+        //     }))
+        // }).catch(err => {
+        //     console.log(err)
+        // })
+    }, [])
 
 
     const onIndexChange = (_, value) => {
-        if(indexes && indexes.length > 0){
+        if (indexes && indexes.length > 0) {
             const _index = indexes.find(i => i.name === value.value)
             setSelectedIndex(_index)
         }
-        
+
     }
 
     const makeApiRequest = (question => {
@@ -79,19 +95,22 @@ const Chat = () => {
         setActiveAnalysisPanelTab(undefined);
 
         try {
-            const history = answers.map(a => ({ user: a[0], bot: a[1].answer }));
+            const history = answers.map(a => ({ user: a[0], assistant: a[1].answer }));
             const request = {
-                history: [...history, { user: question, bot: undefined }],
+                history: [...history, { user: question, assistant: undefined }],
                 approach: "rtr", //Approaches.ReadRetrieveRead,
                 overrides: {
-                    promptTemplate: promptTemplate.length === 0 ? undefined : promptTemplate,
-                    excludeCategory: excludeCategory.length === 0 ? undefined : excludeCategory,
+                    //promptTemplate: promptTemplate.length === 0 ? undefined : promptTemplate,
+                    //excludeCategory: excludeCategory.length === 0 ? undefined : excludeCategory,
                     top: retrieveCount,
-                    semanticRanker: useSemanticRanker,
-                    semanticCaptions: useSemanticCaptions,
-                    suggestFollowupQuestions: useSuggestFollowupQuestions
+                    //semanticRanker: useSemanticRanker,
+                    //vectorSearchPipeline: vectorSearchPipeline,
+                    //semanticCaptions: useSemanticCaptions,
+                    //suggestFollowupQuestions: useSuggestFollowupQuestions,
+                    //facetQueryTermsTemplate: facetQueryTermsTemplate,
+                    //facetTemplate : facetTemplate
                 },
-                index : selectedIndex
+                index: selectedIndex
             };
             chatApi(request).then(result => {
                 setAnswers([...answers, [question, result]]);
@@ -115,33 +134,9 @@ const Chat = () => {
 
     useEffect(() => chatMessageStreamEnd.current?.scrollIntoView({ behavior: "smooth" }), [isLoading]);
 
-    const onPromptTemplateChange = (_ev, newValue) => {
-        setPromptTemplate(newValue || "");
-    };
-
     const onRetrieveCountChange = (_ev, newValue) => {
         setRetrieveCount(parseInt(newValue || "3"));
     };
-
-    const onUseSemanticRankerChange = (_ev, checked) => {
-        setUseSemanticRanker(!!checked);
-    };
-
-    const onUseSemanticCaptionsChange = (_ev, checked) => {
-        setUseSemanticCaptions(!!checked);
-    };
-
-    const onExcludeCategoryChanged = (_ev, newValue) => {
-        setExcludeCategory(newValue || "");
-    };
-
-    const onUseSuggestFollowupQuestionsChange = (_ev, checked) => {
-        setUseSuggestFollowupQuestions(!!checked);
-    };
-
-    // const onExampleClicked = (example) => {
-    //     makeApiRequest(example);
-    // };
 
     const onShowCitation = (citation, index) => {
         if (activeCitation === citation && activeAnalysisPanelTab === AnalysisPanelTabs.CitationTab && selectedAnswer === index) {
@@ -164,22 +159,35 @@ const Chat = () => {
         setSelectedAnswer(index);
     };
 
+    // const onVectorSearchPipeline = (_ev, newValue) => {
+    //     setVectorSearchPipeline(newValue.value)
+    // }
+
     return (
         <div className={styles.container}>
 
             <div className={styles.commandsContainer}>
                 <ClearChatButton className={styles.commandButton} onClick={clearChat} disabled={!lastQuestionRef.current || isLoading} />
                 <SettingsButton className={styles.commandButton} onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)} />
-                <div>
+                <div style={{ marginRight: "10px" }}>
                     <Dropdown
                         search
-                        placeholder="Select the Index"
+                        placeholder="Select the Cognitive Search Index"
                         label="Output"
                         items={indexes.map(sc => sc.name)}
                         onChange={onIndexChange}
 
                     />
                 </div>
+                {/* <div>
+                    <Dropdown
+                        search
+                        placeholder="Select the Vector Embedding Index"
+                        label="Output"
+                        items={pipelines.map(sc => sc.name)}
+                        onChange={onVectorSearchPipeline}
+                    />
+                </div> */}
 
             </div>
             <div className={styles.chatRoot}>
@@ -206,7 +214,7 @@ const Chat = () => {
                                             onThoughtProcessClicked={() => onToggleTab(AnalysisPanelTabs.ThoughtProcessTab, index)}
                                             onSupportingContentClicked={() => onToggleTab(AnalysisPanelTabs.SupportingContentTab, index)}
                                             onFollowupQuestionClicked={q => makeApiRequest(q)}
-                                            showFollowupQuestions={useSuggestFollowupQuestions && answers.length - 1 === index}
+                                            //showFollowupQuestions={useSuggestFollowupQuestions && answers.length - 1 === index}
                                         />
                                     </div>
                                 </div>
@@ -234,7 +242,7 @@ const Chat = () => {
                     <div className={styles.chatInput}>
                         <QuestionInput
                             clearOnSend
-                            placeholder="Type a new question (e.g. does my plan cover annual eye exams?)"
+                            placeholder="Type a new question"
                             disabled={isLoading}
                             onSend={question => makeApiRequest(question)}
                         />
@@ -249,6 +257,7 @@ const Chat = () => {
                         citationHeight="810px"
                         answer={answers[selectedAnswer][1]}
                         activeTab={activeAnalysisPanelTab}
+                        selectedIndex={selectedIndex}
                     />
                 )}
 
@@ -261,14 +270,32 @@ const Chat = () => {
                     onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
                     isFooterAtBottom={true}
                 >
-                    <TextField
+                    {/* <TextField
                         className={styles.chatSettingsSeparator}
                         defaultValue={promptTemplate}
                         label="Override prompt template"
                         multiline
                         autoAdjustHeight
                         onChange={onPromptTemplateChange}
-                    />
+                    /> */}
+
+                    {/* <TextField
+                        className={styles.chatSettingsSeparator}
+                        defaultValue={facetTemplate}
+                        label="Facet Template"
+                        multiline
+                        autoAdjustHeight
+                        onChange={onFacetTemplateChange}
+                    /> */}
+
+                    {/* <TextField
+                        className={styles.chatSettingsSeparator}
+                        defaultValue={facetQueryTermsTemplate}
+                        label="Facet Query Terms Template"
+                        multiline
+                        autoAdjustHeight
+                        onChange={onFacetQueryTermsTemplateChange}
+                    /> */}
 
                     <SpinButton
                         className={styles.chatSettingsSeparator}
@@ -278,7 +305,7 @@ const Chat = () => {
                         defaultValue={retrieveCount.toString()}
                         onChange={onRetrieveCountChange}
                     />
-                    <TextField className={styles.chatSettingsSeparator} label="Exclude category" onChange={onExcludeCategoryChanged} />
+                    {/* <TextField className={styles.chatSettingsSeparator} label="Exclude category" onChange={onExcludeCategoryChanged} />
                     <Checkbox
                         className={styles.chatSettingsSeparator}
                         checked={useSemanticRanker}
@@ -297,11 +324,12 @@ const Chat = () => {
                         checked={useSuggestFollowupQuestions}
                         label="Suggest follow-up questions"
                         onChange={onUseSuggestFollowupQuestionsChange}
-                    />
+                    /> */}
+                    {/* <TextField className={styles.chatSettingsSeparator} label="Vector Search Index" onChange={onVectorSearchPipeline} /> */}
                 </Panel>
             </div>
         </div>
     );
 };
 
-export default Chat;
+export default EnterpriseSearch;

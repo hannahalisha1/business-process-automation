@@ -4,7 +4,8 @@ import { Dialog, Text, TextArea } from '@fluentui/react-northstar';
 
 export default function ToTxtDialog(props) {
 
-    const [container, setContainer] = useState("")
+    // eslint-disable-next-line
+    const [container,_] = useState("documents")
     const [folder, setFolder] = useState("")
     const [maxSegment, setMaxSegment] = useState("")
 
@@ -20,15 +21,13 @@ export default function ToTxtDialog(props) {
         props.setHideDialog(true)
     }
 
-    const onContainerChange = (event, text) => {
-        setContainer(text.value)
-    }
-
-    const onFolderChange = (event, text) => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const onFolderChange = (_, text) => {
         setFolder(text.value)
     }
 
-    const onMaxSegmentChange = (event, text) => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const onMaxSegmentChange = (_, text) => {
         setMaxSegment(text.value)
     }
 
@@ -40,18 +39,14 @@ export default function ToTxtDialog(props) {
                     <div style={{
                             display: 'block', marginBottom: "10px"
                         }}>
-                        <Text content="Container Name" style={{
+                        <Text content="Destination Pipeline for Output" style={{
                             display: 'block', marginBottom: "10px"
                         }} />
-                        <TextArea value={container} onChange={onContainerChange}/>
-                        <Text content="Folder Name" style={{
-                            display: 'block', marginBottom: "10px"
-                        }} />
-                        <TextArea value={folder} onChange={onFolderChange}/>
+                        <TextArea value={folder} onChange={onFolderChange} style={{lineHeight: "8px"}}/>
                         <Text content="Maximum Segment (number of tokens)" style={{
                             display: 'block', marginBottom: "10px"
                         }} />
-                        <TextArea value={maxSegment} onChange={onMaxSegmentChange}/>
+                        <TextArea value={maxSegment} onChange={onMaxSegmentChange} style={{lineHeight: "8px"}}/>
                     </div>
                 </>}
             open={!props.hideDialog}
